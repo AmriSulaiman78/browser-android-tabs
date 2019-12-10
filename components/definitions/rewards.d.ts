@@ -37,6 +37,7 @@ declare namespace Rewards {
     donationAbilityTwitter: boolean
     excluded: string[]
     excludedList: ExcludedPublisher[]
+    promotions?: Promotion[]
     numExcludedSites: number
     excludedPublishersNumber: number
     walletInfo: WalletProperties
@@ -50,6 +51,7 @@ declare namespace Rewards {
       emptyWallet: boolean
       walletServerProblem: boolean
       modalBackup: boolean
+      onlyAnonWallet?: boolean
     }
     autoContributeList: Publisher[],
     safetyNetFailed: boolean
@@ -68,11 +70,6 @@ declare namespace Rewards {
 
   export type GrantStatus = 'wrongPosition' | 'grantGone' | 'generalError' | 'grantAlreadyClaimed' | number | null
 
-  export interface GrantResponse {
-    promotionId?: string
-    status?: number
-    type?: string
-  }
 
   export interface Grant {
     promotionId?: string
@@ -83,6 +80,39 @@ declare namespace Rewards {
     captcha?: string
     hint?: string
     status?: GrantStatus
+  }
+
+  export type CaptchaStatus = 'start' | 'wrongPosition' | 'generalError' | 'finished' | null
+
+  export enum PromotionTypes {
+    UGP = 0,
+    ADS = 1
+  }
+
+  export enum PromotionStatus {
+    ACTIVE = 0,
+    ATTESTED = 1,
+    CLAIMED = 2,
+    SIGNED_TOKENS = 3,
+    FINISHED = 4,
+    OVER = 5
+  }
+
+  export interface Promotion {
+    promotionId: string
+    amount: number
+    expiresAt: number
+    status: PromotionStatus
+    type: PromotionTypes
+    captchaImage?: string
+    captchaId?: string
+    hint?: string
+    captchaStatus?: CaptchaStatus
+  }
+
+  export interface PromotionResponse {
+    result: number
+    promotions: Promotion[]
   }
 
   export interface WalletProperties {

@@ -7,7 +7,7 @@ import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 // Components
-import Grant from './grant'
+import Promotion from './promotion'
 import AdsBox from './adsBox'
 import ContributeBox from './contributeBox'
 import DonationBox from './donationsBox'
@@ -20,9 +20,9 @@ import {
 import { StyledDisabledContent, StyledHeading, StyledText } from './style'
 
 // Utils
+import * as rewardsActions from '../actions/rewards_actions'
 import * as utils from '../utils'
 import { getLocale } from '../../../common/locale'
-import * as rewardsActions from '../actions/rewards_actions'
 
 interface State {
   mainToggle: boolean
@@ -34,6 +34,8 @@ export interface Props extends Rewards.ComponentProps {
 }
 
 class SettingsPage extends React.Component<Props, State> {
+  private balanceTimerId: number
+
   constructor (props: Props) {
     super(props)
     this.state = {
@@ -122,23 +124,23 @@ class SettingsPage extends React.Component<Props, State> {
     })
   }
 
-  getGrantClaims = () => {
-    const { grants } = this.props.rewardsData
+  getPromotionsClaim = () => {
+    const { promotions, ui } = this.props.rewardsData
 
-    if (!grants) {
+    if (!promotions) {
       return null
     }
 
     return (
       <>
-        {grants.map((grant?: Rewards.Grant, index?: number) => {
-          if (!grant || !grant.promotionId) {
+        {promotions.map((promotion?: Rewards.Promotion, index?: number) => {
+          if (!promotion || !promotion.promotionId) {
             return null
           }
 
           return (
             <div key={`grant-${index}`}>
-              <Grant grant={grant} />
+              <Promotion promotion={promotion} onlyAnonWallet={ui.onlyAnonWallet} />
             </div>
           )
         })}
@@ -147,15 +149,12 @@ class SettingsPage extends React.Component<Props, State> {
   }
 
   componentWillUnmount () {
-    const { rewardsIntervalId } = this.props.rewardsData
-
-    if (rewardsIntervalId) {
-      window.clearInterval(rewardsIntervalId)
-    }
+    clearInterval(this.balanceTimerId)
   }
 
   render () {
-    const { enabledMain, balance, onlyAnonWallet } = this.props.rewardsData
+    const { enabledMain, balance } = this.props.rewardsData
+    const { onlyAnonWallet } = this.props.rewardsData.ui
     const { total } = balance
     const convertedBalance = utils.convertBalance((total || 0).toString(), balance.rates)
 
@@ -182,7 +181,7 @@ class SettingsPage extends React.Component<Props, State> {
         }
         {
           enabledMain
-          ? this.getGrantClaims()
+          ? this.getPromotionsClaim()
           : null
         }
         <WalletInfoHeader

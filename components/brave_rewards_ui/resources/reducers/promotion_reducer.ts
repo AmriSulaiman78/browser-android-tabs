@@ -26,51 +26,53 @@ const updateGrant = (newGrant: Rewards.Grant, grants: Rewards.Grant[]) => {
   })
 }
 
-const grantTypeMap = {
-  android: 'ugp'
+
+const updatePromotion = (newPromotion: Rewards.Promotion, promotions: Rewards.Promotion[]): Rewards.Promotion => {
+  const oldPromotion = promotions.filter((promotion: Rewards.Promotion) => newPromotion.promotionId === promotion.promotionId)
+
+  if (oldPromotion.length === 0) {
+    return newPromotion
+  }
+
+  return Object.assign(oldPromotion[0], newPromotion)
 }
 
-const grantReducer: Reducer<Rewards.State | undefined> = (state: Rewards.State, action) => {
+const promotionReducer: Reducer<Rewards.State | undefined> = (state: Rewards.State, action) => {
+  const payload = action.payload
   switch (action.type) {
-    case types.GET_GRANTS:
+    case types.FETCH_PROMOTIONS: {
       chrome.send('brave_rewards.fetchPromotions')
       break
-    case types.ON_GRANT:
+    }
+    case types.ON_PROMOTIONS: {
       state = { ...state }
-      const grantProps = action.payload.properties
-
-      if (grantProps.status === 1) {
+      if (payload.properties.result === 1) {
         break
       }
 
-      if (grantProps.status === 13 && !grantProps.promotionId) {
-        state.grants = []
+      if (!state.promotions) {
+        state.promotions = []
+      }
+
+      let promotions = payload.properties.promotions
+
+      if (!promotions || promotions.length === 0) {
+        state.promotions = []
         break
       }
 
-      if (!state.grants) {
-        state.grants = []
-      }
-
-      const promotionId = grantProps.promotionId
-
-      const grantType = grantTypeMap[grantProps.type] || grantProps.type
-
-      if (!getGrant(promotionId, state.grants)) {
-        state.grants.push({
-          promotionId: promotionId,
-          expiryTime: 0,
-          probi: '',
-          type: grantType
-        })
-      }
+      promotions = promotions.map((promotion: Rewards.Promotion) => {
+        promotion.expiresAt = promotion.expiresAt * 1000
+        return updatePromotion(promotion, state.promotions || [])
+      })
 
       state = {
         ...state,
-        grants: state.grants
+        promotions
       }
 
       break
+    }
     case types.GET_GRANT_CAPTCHA:
       if (!state.grants) {
         break
@@ -238,4 +240,4 @@ const grantReducer: Reducer<Rewards.State | undefined> = (state: Rewards.State, 
   return state
 }
 
-export default grantReducer
+export default promotionReducer
