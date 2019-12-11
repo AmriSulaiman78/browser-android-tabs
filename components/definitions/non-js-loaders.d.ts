@@ -12,7 +12,10 @@ declare module "*.jpg" {
   const url: any;
   export default url;
 }
-
+declare module '*.webp' {
+  const url: any
+  export default url
+}
 declare module "*.gif" {
   const url: any;
   export default url;
