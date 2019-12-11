@@ -31,26 +31,17 @@ export const onPromotions = (properties: Rewards.PromotionResponse) => action(ty
   properties
 })
 
-export const getGrantCaptcha = (promotionId?: string) => action(types.GET_GRANT_CAPTCHA, {
+export const claimPromotion = (promotionId: string) => action(types.CLAIM_PROMOTION, {
   promotionId
 })
 
-export const onGrantCaptcha = (captcha: Rewards.Captcha) => action(types.ON_GRANT_CAPTCHA, {
-  captcha
-})
-
-export const solveGrantCaptcha = (x: number, y: number) => action(types.SOLVE_GRANT_CAPTCHA, {
-  x,
-  y
-})
-
-export const onGrantFinish = (properties: Rewards.GrantFinish) => action(types.ON_GRANT_FINISH, {
+export const onPromotionFinish = (properties: Rewards.PromotionFinish) => action(types.ON_PROMOTION_FINISH, {
   properties
 })
 
-export const onResetGrant = () => action(types.ON_GRANT_RESET)
-
-export const onDeleteGrant = () => action(types.ON_GRANT_DELETE)
+export const deletePromotion = (promotionId: string) => action(types.DELETE_PROMOTION, {
+  promotionId
+})
 
 export const getWalletPassphrase = () => action(types.GET_WALLLET_PASSPHRASE)
 

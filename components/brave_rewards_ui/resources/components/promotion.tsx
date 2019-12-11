@@ -84,16 +84,16 @@ class Promotion extends React.Component<Props, State> {
 
   onClaim = (promotionId?: string) => {
     this.setState({ loading: true })
-    this.actions.getGrantCaptcha(promotionId)
+    this.actions.claimPromotion(promotionId)
     this.setState({ promotionStep: 'complete' })
   }
 
-  onSuccess = () => {
+  onSuccess = (promotionId: string) => {
     this.setState({
       promotionShow: false,
       loading: false
     })
-    this.actions.onDeleteGrant()
+    this.actions.deletePromotion(promotionId)
   }
 
   validPromotion = (tokens?: string) => {

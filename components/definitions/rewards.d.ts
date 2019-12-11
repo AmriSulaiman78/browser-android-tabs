@@ -127,11 +127,9 @@ declare namespace Rewards {
     grants?: Grant[]
   }
 
-  export interface GrantFinish {
+  export interface PromotionFinish {
     result: Result,
-    probi: string,
-    status: number,
-    expiryTime: number
+    promotion?: Promotion
   }
 
   export enum Status {
@@ -172,7 +170,9 @@ declare namespace Rewards {
   }
 
   export interface Captcha {
-    image: string
+    result: number
+    promotionId: string
+    captchaImage: string
     hint: string
   }
 
